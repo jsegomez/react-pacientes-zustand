@@ -1,14 +1,20 @@
 import { useForm } from "react-hook-form"
-import type { PatienteFormData } from "../types";
+import { v4 as uuid } from "uuid";
+
+import type { DraftPatiente, Patient } from "../types";
 import FormErrorMessage from "./FormErrorMessage";
+import { userPatitenteStore } from "../store/store";
 
 export default function PatientForm() {
-  const { register, handleSubmit, formState: { isValid, errors } } = useForm<PatienteFormData>(
+  const { addPatiente } = userPatitenteStore();
+  const { register, handleSubmit, formState: { isValid, errors }, reset } = useForm<DraftPatiente>(
     { mode: 'all' }
   );
 
-  const onSubmit = (data: PatienteFormData) => {
-    console.log(data);
+  const onSubmit = (data: DraftPatiente) => {
+    const patient: Patient = { ...data, id: uuid() }
+    addPatiente(patient);
+    reset();
   };
   
   return (
@@ -118,7 +124,7 @@ export default function PatientForm() {
             <input
                 type="submit"
                 disabled={!isValid}
-                className="bg-indigo-600 w-full p-3 text-white uppercase font-bold hover:bg-indigo-700 cursor-pointer transition-colors disabled:cursor-not-allowed disabled:bg-gray-400"
+                className="bg-indigo-600 w-full p-3 text-white uppercase font-bold hover:bg-indigo-700 cursor-pointer transition-colors disabled:cursor-not-allowed disabled:bg-indigo-300"
                 value='Guardar Paciente'
             />
         </form> 
