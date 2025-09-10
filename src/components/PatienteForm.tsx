@@ -4,18 +4,40 @@ import { v4 as uuid } from "uuid";
 import type { DraftPatiente, Patient } from "../types";
 import FormErrorMessage from "./FormErrorMessage";
 import { userPatitenteStore } from "../store/store";
+import { useEffect } from "react";
 
 export default function PatientForm() {
-  const { addPatiente } = userPatitenteStore();
-  const { register, handleSubmit, formState: { isValid, errors }, reset } = useForm<DraftPatiente>(
+  const { addPatiente, updatePatient, patientToEdit, setPatientToEdit } = userPatitenteStore();
+  const { register, handleSubmit, formState: { isValid, errors }, reset, setValue } = useForm<DraftPatiente>(
     { mode: 'all' }
   );
 
   const onSubmit = (data: DraftPatiente) => {
-    const patient: Patient = { ...data, id: uuid() }
-    addPatiente(patient);
+    if(patientToEdit){
+      const patient: Patient = { ...data, id: patientToEdit.id }
+      updatePatient(patient);            
+    }else{
+      const patient: Patient = { ...data, id: uuid() }
+      addPatiente(patient);          
+    }
     reset();
   };
+
+  useEffect(() => {
+    if (patientToEdit) {
+      const { name, caretaker, email, date, symptoms } = patientToEdit ;
+      setValue('name', name);
+      setValue('caretaker', caretaker);
+      setValue('email', email);
+      setValue('date', date);
+      setValue('symptoms', symptoms);
+    }
+  }, [patientToEdit, setValue]);
+
+  const cancelEdit = () => {
+    setPatientToEdit(null);
+    reset();
+  }
   
   return (
     <div className="md:w-1/2 lg:w-2/5 mx-5">
@@ -127,6 +149,14 @@ export default function PatientForm() {
                 className="bg-indigo-600 w-full p-3 text-white uppercase font-bold hover:bg-indigo-700 cursor-pointer transition-colors disabled:cursor-not-allowed disabled:bg-indigo-300"
                 value='Guardar Paciente'
             />
+
+            <button
+                type="button"                
+                className="bg-red-500 w-full p-3 text-white uppercase font-bold hover:bg-red-700 cursor-pointer transition-colors mt-5"
+                onClick={ cancelEdit }
+            >
+                Cancelar
+            </button>
         </form> 
     </div>
   )

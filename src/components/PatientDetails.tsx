@@ -1,13 +1,17 @@
 import type { Patient } from "../types";
 import PatientDetailItem from "./PatientDetailItem";
+import { userPatitenteStore } from "../store/store";
 
 type PatientDetailsProps = {
     patient: Patient;
 }
 
 export default function PatientDetails({ patient }: PatientDetailsProps) {
+  const { setPatientToEdit, deletePatient } = userPatitenteStore();
+
   return (
     <div className="bg-white shadow-md rounded-lg py-10 px-5 mx-5 mb-5">
+        <PatientDetailItem label="ID" value={patient.id} />
         <PatientDetailItem label="Nombre" value={patient.name} />
         <PatientDetailItem label="Propietario" value={patient.caretaker} />
         <PatientDetailItem label="Email" value={patient.email} />
@@ -15,10 +19,10 @@ export default function PatientDetails({ patient }: PatientDetailsProps) {
         <PatientDetailItem label="Síntomas" value={patient.symptoms} />
 
         <div className="flex justify-between mt-10 mt-5">
-          <button type="button" className="py-2 px-10 bg-indigo-600 hover:bg-indigo-700 transition-colors text-white rounded-md font-bold">
+          <button type="button" onClick={() => setPatientToEdit(patient)} className="py-2 px-10 bg-indigo-600 hover:bg-indigo-700 transition-colors text-white rounded-md font-bold cursor-pointer">
             Editar
           </button>
-          <button type="button" className="py-2 px-10 bg-red-600 hover:bg-red-700 transition-colors text-white rounded-md font-bold">
+          <button type="button" onClick={() => deletePatient(patient.id) } className="py-2 px-10 bg-red-600 hover:bg-red-700 transition-colors text-white rounded-md font-bold cursor-pointer">
             Eliminar
           </button>
         </div>
